@@ -1,4 +1,4 @@
-# my_credit
+# ok_credit
 
 A new Flutter project.
 
