@@ -12,6 +12,7 @@ class ConfigBloc extends Bloc<ConfigEvent, ConfigState> {
 
 // ************************************Bloc Variable *********************
   bool isDarkModeOn = false;
+  bool isLoading = false;
 // ************************************Bloc Variable *********************
 
   @override

@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:ok_credit/components/custom_alert_box.dart';
 import 'package:ok_credit/components/heading_text_center.dart';
 import 'package:ok_credit/components/roanded_button.dart';
 import 'package:ok_credit/components/rounded_image_center.dart';
 import 'package:flutter_awesome_alert_box/flutter_awesome_alert_box.dart';
+import 'package:ok_credit/config/config_bloc.dart';
+import 'package:ok_credit/config/config_event.dart';
+import 'package:ok_credit/login_page/login_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   static final routeName = "/loginScreen";
@@ -37,6 +42,51 @@ class _LoginScreenState extends State<LoginScreen> {
               "Mobile Number is not valid, Please check the number and try again.");
     } else {
       //  ********************************Check Authentication *****************************
+      LoginProvider()
+          .checkLoginAuthentication(
+              mobileNumber: mobileNumberController.text,
+              password: passwordController.text)
+          .then((value) {
+        ConfigBloc().dispatch(SetLoadingEvent(true));
+        if (value["result"] == "Invalid_User") {
+          // ***************************************invalid info *************************
+          DangerAlertBox(
+              context: context,
+              title: "Error",
+              messageText:
+                  "Login information is incorrect, Please enter valid data.");
+        } else if (value["result"] == "Error") {
+          // ***************************************Something Went Wrong *************************
+          DangerAlertBox(
+              context: context,
+              title: "Error",
+              messageText: "Oops. something went wrong.");
+        } else if (value["result"] == "Network_Problem") {
+          // **************************Network/OR Socket Problem**************************
+          WarningAlertBox(
+              context: context,
+              title: "Network Problem",
+              messageText: "Check your internet OR Wi-Fi connection.");
+        } else {
+          // ***********************************Account Created****************************
+          // **************************Clear InputBox value***********************
+
+          mobileNumberController.clear();
+          passwordController.clear();
+          // **************************Clear InputBox value***********************
+
+          CustomAlertBox(
+              context: context,
+              title: "Well Done!",
+              infoMessage: "Login successfully.",
+              sideBorderColor: Color(0xFF6253FD),
+              buttonColor: Color(0xFF6253FD),
+              iconColor: Color(0xFF6253FD),
+              icon: FontAwesomeIcons.checkCircle);
+        }
+        ConfigBloc().dispatch(SetLoadingEvent(false));
+      });
+
       //  ********************************Check Authentication *****************************
     }
   }
@@ -101,6 +151,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     height: 6.0,
                   ),
+                  ConfigBloc().isLoading
+                      ? Container(
+                          margin: EdgeInsets.only(bottom: 4.0),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                          ),
+                        )
+                      : Container(),
                   RoundedButton(
                     onPressed: () {
                       validateInfo();

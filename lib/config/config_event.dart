@@ -42,3 +42,24 @@ class SetDarkMode extends ConfigEvent {
   }
 }
 // ****************************************DarkModeEvent****************************
+
+// *************************************SetLoadingEvent*******************************
+class SetLoadingEvent extends ConfigEvent {
+  final bool isLoading;
+
+  SetLoadingEvent(this.isLoading);
+  @override
+  String toString() => "SetLoadingEvent";
+
+  @override
+  Future<ConfigState> applyAsync(
+      {ConfigState currentState, ConfigBloc bloc}) async {
+    try {
+      bloc.isLoading = this.isLoading;
+      return InConfigState();
+    } catch (_) {
+      return ErrorConfigState(_?.toString());
+    }
+  }
+}
+// *************************************SetLoadingEvent*******************************

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_awesome_alert_box/flutter_awesome_alert_box.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ok_credit/components/custom_alert_box.dart';
 import 'package:ok_credit/components/heading_text_center.dart';
 import 'package:ok_credit/components/roanded_button.dart';
 import 'package:ok_credit/components/rounded_image_center.dart';
+import 'package:ok_credit/config/config_bloc.dart';
+import 'package:ok_credit/config/config_event.dart';
+import 'package:ok_credit/login_page/login_provider.dart';
 
 class CreateAccount extends StatefulWidget {
   static final routeName = "/createAccount";
@@ -73,14 +77,56 @@ class _CreateAccountState extends State<CreateAccount> {
           messageText: "Invalid email address, Check the email and try again.");
     } else {
       // ***********************************Create Account************************
-      CustomAlertBox(
-          context: context,
-          title: "Well Done!",
-          infoMessage: "Account created successfully.",
-          sideBorderColor: Color(0xFF6253FD),
-          buttonColor: Color(0xFF6253FD),
-          iconColor: Color(0xFF6253FD),
-          icon: FontAwesomeIcons.checkCircle);
+
+      ConfigBloc().dispatch(SetLoadingEvent(true));
+      LoginProvider()
+          .createAccount(
+              firstName: firstNameController.text,
+              lastName: lastNameController.text,
+              email: emailController.text,
+              mobileNumber: mobileNumberController.text,
+              password: mobileNumberController.text)
+          .then((result) {
+        if (result["result"] == "Data_Found") {
+          //  *************************Account already exists*****************************
+          WarningAlertBox(
+              context: context,
+              title: "Oops!",
+              messageText: "Account already exist.");
+          // print("Data_Founf");
+        } else if (result["result"] == "Error") {
+          // **************************Something went wrong**************************
+          DangerAlertBox(
+              context: context,
+              title: "Error",
+              messageText: "Oops. something went wrong.");
+        } else if (result["result"] == "Network_Problem") {
+          // **************************Network/OR Socket Problem**************************
+          WarningAlertBox(
+              context: context,
+              title: "Network Problem",
+              messageText: "Check your internet OR Wi-Fi connection.");
+        } else {
+          // ***********************************Account Created****************************
+          // **************************Clear InputBox value***********************
+          firstNameController.clear();
+          lastNameController.clear();
+          emailController.clear();
+          mobileNumberController.clear();
+          passwordController.clear();
+          // **************************Clear InputBox value***********************
+
+          CustomAlertBox(
+              context: context,
+              title: "Well Done!",
+              infoMessage: "Account created successfully.",
+              sideBorderColor: Color(0xFF6253FD),
+              buttonColor: Color(0xFF6253FD),
+              iconColor: Color(0xFF6253FD),
+              icon: FontAwesomeIcons.checkCircle);
+        }
+        ConfigBloc().dispatch(SetLoadingEvent(false));
+      });
     }
   }
 
@@ -132,6 +178,7 @@ class _CreateAccountState extends State<CreateAccount> {
                         TextField(
                           decoration: InputDecoration(hintText: "First Name"),
                           controller: firstNameController,
+                          textCapitalization: TextCapitalization.words,
                         ),
                         SizedBox(
                           height: 6.0,
@@ -139,6 +186,7 @@ class _CreateAccountState extends State<CreateAccount> {
                         TextField(
                           decoration: InputDecoration(hintText: "Last Name"),
                           controller: lastNameController,
+                          textCapitalization: TextCapitalization.words,
                         ),
                         SizedBox(
                           height: 6.0,
@@ -146,8 +194,9 @@ class _CreateAccountState extends State<CreateAccount> {
                         TextField(
                           maxLength: 10,
                           keyboardType: TextInputType.phone,
-                          decoration:
-                              InputDecoration(hintText: "Mobile Number"),
+                          decoration: InputDecoration(
+                            hintText: "Mobile Number",
+                          ),
                           controller: mobileNumberController,
                         ),
                         SizedBox(
@@ -171,6 +220,14 @@ class _CreateAccountState extends State<CreateAccount> {
                         SizedBox(
                           height: 6.0,
                         ),
+                        ConfigBloc().isLoading
+                            ? Container(
+                                margin: EdgeInsets.only(bottom: 4.0),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                ),
+                              )
+                            : Container(),
                         RoundedButton(
                           onPressed: () {
                             validateInfo();
