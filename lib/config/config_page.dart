@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ok_credit/config/config_bloc.dart';
 import 'package:ok_credit/config/config_state.dart';
+import 'package:ok_credit/home_page/home_page.dart';
 import 'package:ok_credit/login_page/create_account.dart';
 import 'package:ok_credit/login_page/login_page.dart';
 import 'package:ok_credit/login_page/login_screen.dart';
@@ -27,6 +28,10 @@ class _ConfigPageState extends State<ConfigPage> {
     configBloc = ConfigBloc();
     configBloc.isDarkModeOn =
         MyCredit.prefs.getBool(MyCredit.darkModePref) ?? false;
+    configBloc.isLoggedIn =
+        MyCredit.prefs.getBool(MyCredit.isLoginPrefs) ?? false;
+
+    configBloc.loginId = MyCredit.prefs.get(MyCredit.userLoginIdPrefs) ?? "";
   }
   // **************************************setUpApp***************************
 
@@ -134,7 +139,7 @@ class _ConfigPageState extends State<ConfigPage> {
                         ConfigBloc().isDarkModeOn ? Colors.black : Colors.white,
                     textTheme: ButtonTextTheme.primary),
                 appBarTheme: AppBarTheme(elevation: MyCredit.appBarElevation)),
-            home: LoginPage(),
+            home: ConfigBloc().isLoggedIn ? HomePage() : LoginPage(),
             routes: {
               LoginPage.routeName: (context) => LoginPage(),
               CreateAccount.routeName: (context) => CreateAccount(),

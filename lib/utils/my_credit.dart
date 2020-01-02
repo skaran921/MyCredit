@@ -14,7 +14,8 @@ class MyCredit {
 
   // *************************IP Address ****************
   // skaran921.000webhostapp.com
-  static const String baseApiURL = "https://192.168.137.1/MyCredit/api/";
+  static const String baseApiURL =
+      "https://skaran921.000webhostapp.com/MyCredit/api/";
   static const String creatAccountApiParam = "create_account.php";
   static const String loginApiParam = "login.php";
 

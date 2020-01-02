@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:ok_credit/config/index.dart';
+import 'package:ok_credit/utils/my_credit.dart';
 
 @immutable
 abstract class ConfigEvent extends Equatable {
@@ -34,6 +35,7 @@ class SetDarkMode extends ConfigEvent {
       {ConfigState currentState, ConfigBloc bloc}) async {
     try {
       bloc.isDarkModeOn = darkMode;
+      MyCredit.prefs.setBool(MyCredit.darkModePref, this.darkMode);
       return InConfigState();
     } catch (_, stacktrace) {
       print('$_ $stacktrace');
@@ -63,3 +65,27 @@ class SetLoadingEvent extends ConfigEvent {
   }
 }
 // *************************************SetLoadingEvent*******************************
+
+// *************************************LoginEvent*******************************
+class LoginEvent extends ConfigEvent {
+  final String loginId;
+
+  LoginEvent(this.loginId);
+  @override
+  String toString() => "SetLoadingEvent";
+
+  @override
+  Future<ConfigState> applyAsync(
+      {ConfigState currentState, ConfigBloc bloc}) async {
+    try {
+      bloc.isLoggedIn = true;
+      bloc.loginId = loginId;
+      MyCredit.prefs.setBool(MyCredit.isLoginPrefs, true);
+      MyCredit.prefs.setString(MyCredit.userLoginIdPrefs, "${this.loginId}");
+      return InConfigState();
+    } catch (_) {
+      return ErrorConfigState(_?.toString());
+    }
+  }
+}
+// *************************************LoginEvent*******************************

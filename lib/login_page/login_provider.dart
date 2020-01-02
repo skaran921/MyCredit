@@ -20,7 +20,7 @@ class LoginProvider {
           });
 
       var jsonResponse = json.decode(response.body);
-      print(jsonResponse);
+      // print(jsonResponse);
       return jsonResponse;
     } on HttpException {
       return {"result": "Network_Problem"};
