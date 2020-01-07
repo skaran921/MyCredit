@@ -30,6 +30,7 @@ dependencies:
   permission_handler: ^4.0.0
   data_connection_checker: ^0.3.4
   flutter_awesome_alert_box: ^1.0.1
+  floating_search_bar: ^0.2.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

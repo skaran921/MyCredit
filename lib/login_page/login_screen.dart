@@ -7,6 +7,7 @@ import 'package:ok_credit/components/rounded_image_center.dart';
 import 'package:flutter_awesome_alert_box/flutter_awesome_alert_box.dart';
 import 'package:ok_credit/config/config_bloc.dart';
 import 'package:ok_credit/config/config_event.dart';
+import 'package:ok_credit/home_page/home_page.dart';
 import 'package:ok_credit/login_page/login_provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -42,12 +43,13 @@ class _LoginScreenState extends State<LoginScreen> {
               "Mobile Number is not valid, Please check the number and try again.");
     } else {
       //  ********************************Check Authentication *****************************
+      ConfigBloc().dispatch(SetLoadingEvent(true));
+
       LoginProvider()
           .checkLoginAuthentication(
               mobileNumber: mobileNumberController.text,
               password: passwordController.text)
           .then((value) {
-        ConfigBloc().dispatch(SetLoadingEvent(true));
         if (value["result"] == "Invalid_User") {
           // ***************************************invalid info *************************
           DangerAlertBox(
@@ -74,7 +76,8 @@ class _LoginScreenState extends State<LoginScreen> {
           mobileNumberController.clear();
           passwordController.clear();
           // **************************Clear InputBox value***********************
-
+          ConfigBloc().dispatch(SetLoadingEvent(false));
+          ConfigBloc().dispatch(LoginEvent("${value["USER_ID"]}"));
           CustomAlertBox(
               context: context,
               title: "Well Done!",
@@ -83,6 +86,8 @@ class _LoginScreenState extends State<LoginScreen> {
               buttonColor: Color(0xFF6253FD),
               iconColor: Color(0xFF6253FD),
               icon: FontAwesomeIcons.checkCircle);
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => HomePage()));
         }
         ConfigBloc().dispatch(SetLoadingEvent(false));
       });
